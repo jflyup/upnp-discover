@@ -9,11 +9,11 @@ LIBOBJ = $(LIBSRC:%.c=%.o)
 
 all: upnp-discover
 
-upnp-discover: upnp-discover.o $(LIBOBJ)
-	$(CC) $(LDFLAGS) $(LIBOBJ) upnp-discover.o -o upnp-discover
+upnp-discover: upnp.o $(LIBOBJ)
+	$(CC) $(LDFLAGS) $(LIBOBJ) upnp.o -o upnp-discover
 
 clean:
-	rm -f $(LIBOBJ) upnp-discover.o upnp-discover
+	rm -f $(LIBOBJ) upnp.o upnp-discover
 
 .PHONY: clean
 
