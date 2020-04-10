@@ -160,8 +160,6 @@ int send_ssdp_request(int sock)
     return ret;
 }
 
-/*
-
 int get_ssdp_responses(int sock, struct str_vector *vector)
 {
     int ret = 0, bytes_in, done = false;
