@@ -51,6 +51,7 @@ int opt_verbose = false;
 int opt_rdns_lookup = false;
 int opt_timeout = 5;
 
+
 int discover_hosts(struct str_vector *vector);
 int send_ssdp_request(int sock);
 int get_ssdp_responses(int sock, struct str_vector *vector);
@@ -160,12 +161,7 @@ int send_ssdp_request(int sock)
 }
 
 /*
- * *******************************************************************
- * Function: get_ssdp_responses()
- * Purpose: Process all incoming SSDP responses.
- * Returns: 0 on success, non-zero if error occurred.
- * *******************************************************************
- */
+
 int get_ssdp_responses(int sock, struct str_vector *vector)
 {
     int ret = 0, bytes_in, done = false;
@@ -269,14 +265,7 @@ int get_ssdp_responses(int sock, struct str_vector *vector)
     return ret;
 }
 
-/*
- * *******************************************************************
- * Function: rdns_lookup()
- * Purpose: Given an IP address in *ip_addr, return its hostname in 
- *           *hostname, not to exeed hostname_size
- * Returns: 0 on success
- * *******************************************************************
- */
+
 int rdns_lookup(char *ip_addr, char *hostname, int hostname_size)
 {
     int ret;
@@ -295,13 +284,7 @@ int rdns_lookup(char *ip_addr, char *hostname, int hostname_size)
     return(ret);
 }
 
-/*
- * *******************************************************************
- * Function: parse_cmd_opts()
- * Purpose: Given argc and argv[], parse the command line options.
- * Returns: 0 on success, exits on failure
- * *******************************************************************
- */
+
 int parse_cmd_opts(int argc, char *argv[])
 {
     int cmdopt;
