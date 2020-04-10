@@ -9,7 +9,7 @@ LIBOBJ = $(LIBSRC:%.c=%.o)
 
 all: upnp-discover
 
-lsupnp: lsupnp.o $(LIBOBJ)
+upnp-discover: upnp-discover.o $(LIBOBJ)
 	$(CC) $(LDFLAGS) $(LIBOBJ) upnp-discover.o -o upnp-discover
 
 clean:
