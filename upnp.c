@@ -1,21 +1,6 @@
-/*
- *  lsupnp.c
- *  Simple command-line program to discover all UPnP devices on a network.
- *
- *  Permission to use, copy, modify, and/or distribute this software
- *  for any purpose with or without fee is hereby granted, provided
- *  that the above copyright notice and this permission notice appear
- *  in all copies.
- *
- *  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL 
- *  WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
- *  WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
- *  AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
- *  DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA
- *  OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
- *  TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
- *  PERFORMANCE OF THIS SOFTWARE.
- */
+
+// Simple command-line program to discover all UPnP devices on local network.
+
 
 #define _GNU_SOURCE     /* for strcasestr() */
 
@@ -80,7 +65,6 @@ int discover_hosts(struct str_vector *vector)
     int ret = 0, sock;
     struct sockaddr_in src_sock;
     
-    /* Get a socket */
     if ((sock = socket(PF_INET, SOCK_DGRAM, 0)) < 0) 
     {
         ret = errno;
@@ -88,10 +72,12 @@ int discover_hosts(struct str_vector *vector)
         return(ret);
     }
 
-    /* Bind client-side (source) port to socket */
     memset(&src_sock, 0, sizeof(src_sock));
     src_sock.sin_family = AF_INET;
+    // bind to INADDR_ANY, means to use all available adapters for 
+    // listening and to choose the best adapter for sending
     src_sock.sin_addr.s_addr = htonl(INADDR_ANY);
+    // let OS assign a port number for that socket
     src_sock.sin_port = htons(opt_source_port);
 
     if ((ret = bind(sock, (struct sockaddr *)&src_sock, 
@@ -100,17 +86,16 @@ int discover_hosts(struct str_vector *vector)
         ret = errno;
         perror("bind()");
         goto close_socket;
-    }
-    else if ( (opt_verbose == true) && (opt_source_port != 0) )
+    } else if ( (opt_verbose == true) && (opt_source_port != 0) )
+    {
         printf("[Client bound to port %d]\n\n", opt_source_port);
+    }
 
-    /* Send SSDP request */
     if ((ret = send_ssdp_request(sock)) != 0)
     {
         goto close_socket;
     }
 
-    /* Get SSDP responses */
     if ((ret = get_ssdp_responses(sock, vector)) != 0)
     {
         goto close_socket;
@@ -131,13 +116,11 @@ int send_ssdp_request(int sock)
     int ret = 0, len, bytes_out;
     struct sockaddr_in dest_sock;
 
-    /* Prepare destination info */
     memset(&dest_sock, 0, sizeof(dest_sock));
     dest_sock.sin_family = AF_INET;
     dest_sock.sin_port = htons(SSDP_MULTICAST_PORT);
     inet_pton(AF_INET, SSDP_MULTICAST_ADDRESS, &dest_sock.sin_addr);
 
-    /* Send SSDP request */
     len = strlen(ssdp_discover_string);
 
     if ((bytes_out = sendto(sock, ssdp_discover_string, 
@@ -164,7 +147,7 @@ int get_ssdp_responses(int sock, struct str_vector *vector)
 {
     int ret = 0, bytes_in, done = false;
     unsigned int host_sock_len;
-    struct sockaddr_in host_sock;
+    struct sockaddr host_sock;
     char buffer[MAX_BUFFER_LEN];
     char host[NI_MAXHOST];
     char *url_start, *host_start, *host_end;
@@ -176,7 +159,6 @@ int get_ssdp_responses(int sock, struct str_vector *vector)
     timeout.tv_sec = opt_timeout;
     timeout.tv_usec = 0;
 
-    /* Loop through SSDP discovery request responses */
     do
     {
         if ((ret = select(sock+1, &read_fds, NULL, NULL, &timeout)) < 0) 
@@ -198,7 +180,6 @@ int get_ssdp_responses(int sock, struct str_vector *vector)
             }
             buffer[bytes_in] = '\0';
 
-            /* Parse valid responses */
             if (strncmp(buffer, "HTTP/1.1 200 OK", 12) == 0)
             {
                 if ( opt_verbose == true ) 
@@ -318,6 +299,4 @@ int parse_cmd_opts(int argc, char *argv[])
 
     return(0);
 }
-
-/* EOF */
 
